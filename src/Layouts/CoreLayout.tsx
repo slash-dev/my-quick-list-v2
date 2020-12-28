@@ -1,19 +1,12 @@
 import React, { useState, ReactElement } from 'react'
-import { render } from 'react-dom'
-import { Provider } from 'react-redux'
-import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
-import { combineReducers, compose } from 'redux'
 import {
-  useFirebase, isLoaded, isEmpty,
-  ReactReduxFirebaseProvider,
-  firebaseReducer
+  useFirebase, isLoaded, isEmpty
 } from 'react-redux-firebase'
-import { createFirestoreInstance, firestoreReducer } from 'redux-firestore'
 import { useSelector } from 'react-redux'
 import GoogleButton from 'react-google-button'
-import { BrowserRouter as Router, Route, NavLink, Switch } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import KitchenIcon from '@material-ui/icons/Kitchen';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import FastfoodIcon from '@material-ui/icons/Fastfood';
@@ -24,8 +17,8 @@ import MenuIcon from '@material-ui/icons/Menu';
 import {
   CircularProgress, Hidden, Drawer, Divider,
   List, ListItem, ListItemIcon, ListItemText, withStyles, Theme,
-  WithStyles, CssBaseline, AppBar, Toolbar, IconButton, Typography,
-  Avatar, Menu, MenuItem, Slide, useScrollTrigger
+  CssBaseline, AppBar, Toolbar, IconButton, Typography,
+  Menu, MenuItem, Slide, useScrollTrigger, Avatar
 } from '@material-ui/core';
 import { RootState } from '../Model/reducer'
 
@@ -91,7 +84,7 @@ const styles = (theme: Theme) => ({
   },
 });
 
-function CoreLayout(props: any) {
+function Layout(props: any) {
   const { classes, children } = props;
   const firebase = useFirebase()
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -140,105 +133,115 @@ function CoreLayout(props: any) {
     </div>
   );
 
+  const auth = useSelector((state: RootState) => state.firebase.auth)
+
+  return <div className={classes.root}>
+    <CssBaseline />
+    <HideOnScroll {...props}>
+      <AppBar position="fixed" className={classes.appBar}>
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            className={classes.menuButton}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap>
+            Easy shopping list
+                </Typography>
+
+          <div style={{ flexGrow: 1 }} />
+
+          <IconButton
+            edge="end"
+            aria-label="account of current user"
+            aria-haspopup="true"
+            color="inherit"
+            onClick={(event) => {
+              setAnchorLoginMenuEl(event.currentTarget);
+            }}
+          >
+            {auth.photoURL ?
+              <Avatar alt={auth.displayName || ''} src={auth.photoURL} />
+              : <AccountCircle />}
+          </IconButton>
+
+          <Menu
+            id="customized-menu"
+            anchorEl={anchorLoginMenuEl}
+            keepMounted
+            open={Boolean(anchorLoginMenuEl)}
+            onClose={closeLoginMenu}
+            getContentAnchorEl={null}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+          >
+            <MenuItem onClick={logout}>
+              <ListItemIcon>
+                <MeetingRoom fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary="Log out" />
+            </MenuItem>
+          </Menu>
+        </Toolbar>
+      </AppBar>
+    </HideOnScroll>
+    <nav className={classes.drawer} aria-label="mailbox folders">
+      <Hidden smUp implementation="css">
+        <Drawer
+          variant="temporary"
+          anchor="left"
+          open={openDrawer}
+          onClose={handleDrawerToggle}
+          classes={{
+            paper: classes.drawerPaper,
+          }}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+        >
+          {drawer}
+        </Drawer>
+      </Hidden>
+      <Hidden xsDown implementation="css">
+        <Drawer
+          classes={{
+            paper: classes.drawerPaper,
+          }}
+          variant="permanent"
+          open
+        >
+          {drawer}
+        </Drawer>
+      </Hidden>
+    </nav>
+
+    <main className={classes.content}>
+      <div className={classes.toolbar} ></div>
+      {children}
+    </main>
+  </div>
+}
+
+const LayoutWithStyles = withStyles(styles)(Layout)
+
+function CoreLayout(props: any) {
+  const { children } = props;
+
   return (
     <UserIsAuthenticated >
-      <div className={classes.root}>
-        <CssBaseline />
-        <HideOnScroll {...props}>
-          <AppBar position="fixed" className={classes.appBar}>
-            <Toolbar>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                edge="start"
-                onClick={handleDrawerToggle}
-                className={classes.menuButton}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Typography variant="h6" noWrap>
-                Easy shopping list
-                    </Typography>
-
-              <div style={{ flexGrow: 1 }} />
-
-              <IconButton
-                edge="end"
-                aria-label="account of current user"
-                aria-haspopup="true"
-                color="inherit"
-                onClick={(event) => {
-                  setAnchorLoginMenuEl(event.currentTarget);
-                }}
-              >
-                {/* {this.state.user!.photoURL ?
-                        <Avatar alt={this.state.user!.displayName} src={this.state.user!.photoURL!} /> */}
-                <AccountCircle />
-              </IconButton>
-
-              <Menu
-                id="customized-menu"
-                anchorEl={anchorLoginMenuEl}
-                keepMounted
-                open={Boolean(anchorLoginMenuEl)}
-                onClose={closeLoginMenu}
-                getContentAnchorEl={null}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'center',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-              >
-                <MenuItem onClick={logout}>
-                  <ListItemIcon>
-                    <MeetingRoom fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="Log out" />
-                </MenuItem>
-              </Menu>
-            </Toolbar>
-          </AppBar>
-        </HideOnScroll>
-        <nav className={classes.drawer} aria-label="mailbox folders">
-          <Hidden smUp implementation="css">
-            <Drawer
-              variant="temporary"
-              anchor="left"
-              open={openDrawer}
-              onClose={handleDrawerToggle}
-              classes={{
-                paper: classes.drawerPaper,
-              }}
-              ModalProps={{
-                keepMounted: true, // Better open performance on mobile.
-              }}
-            >
-              {drawer}
-            </Drawer>
-          </Hidden>
-          <Hidden xsDown implementation="css">
-            <Drawer
-              classes={{
-                paper: classes.drawerPaper,
-              }}
-              variant="permanent"
-              open
-            >
-              {drawer}
-            </Drawer>
-          </Hidden>
-        </nav>
-
-        <main className={classes.content}>
-          <div className={classes.toolbar} ></div>
-          {children}
-        </main>
-      </div>
+      <LayoutWithStyles>{children}</LayoutWithStyles>
     </UserIsAuthenticated>
   );
 }
 
-export default withStyles(styles)(CoreLayout)
+export default CoreLayout
