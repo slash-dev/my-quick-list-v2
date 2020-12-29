@@ -52,6 +52,7 @@
     ]
   },
   "devDependencies": {
-    "@types/react-router-dom": "^5.1.6"
+    "@types/react-router-dom": "^5.1.6",
+    "redux-devtools-extension": "^2.13.8"
   }
 }

@@ -1,23 +1,8 @@
-import { createStore } from "redux";
+import { applyMiddleware, createStore } from "redux";
 import { rootReducer } from "./reducer";
+import thunk from "redux-thunk";
+import { composeWithDevTools } from 'redux-devtools-extension'
 
-export default function configureStore(initialState: any) {
-  return createStore(rootReducer, initialState);
+export default function configureStore(initialState: any = {}) {
+  return createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)));
 }
-
-// export default function configureStore(initialState: any) {
-//   const middleware = [thunk.withExtraArgument({ getFirebase })]
-//   const createStoreWithMiddleware = compose(
-//     applyMiddleware(...middleware),
-//     typeof window === 'object' &&
-//       // @ts-ignore
-//       typeof window.devToolsExtension !== 'undefined'
-//       // @ts-ignore
-//       ? () => window.__REDUX_DEVTOOLS_EXTENSION__
-//       : (f: any) => f
-//   )(createStore)
-//   // @ts-ignore
-//   const store = createStoreWithMiddleware(rootReducer, initialState)
-
-//   return store
-// }

@@ -11,7 +11,7 @@ import { createFirestoreInstance } from 'redux-firestore'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import configureStore from './Model/store'
 import CoreLayout from './Layouts/CoreLayout'
-import Recipes from './Components/Recipes'
+import Recipes from './Components/Recipes/Recipes'
 
 const firebaseConfig = {
   apiKey: "AIzaSyD8h6ZzS0SRK7ZAIj4lMOpfXZ-NMvSEKcg",
@@ -23,22 +23,14 @@ const firebaseConfig = {
   appId: "1:922228656385:web:ecb7fdff2eb0cbcd"
 };
 
-// react-redux-firebase config
-const rrfConfig = {
-  userProfile: 'users',
-  useFirestoreForProfile: true
-  // enableClaims: true // Get custom claims along with the profile
-}
-
 firebase.initializeApp(firebaseConfig)
 firebase.firestore()
 
-const initialState = {};
-const store = configureStore(initialState)
+const store = configureStore();
 
 const rrfProps = {
   firebase,
-  config: rrfConfig,
+  config: {},
   dispatch: store.dispatch,
   createFirestoreInstance
 }
