@@ -15,7 +15,6 @@ function RecipesList({ recipes }: { recipes: Recipe[] }) {
   if (isEmpty(recipes)) {
     return <p>Recipes list is empty</p>
   }
-  console.log(recipes);
   return <div>
     {recipes
       .map((recipe: Recipe) => (
@@ -25,12 +24,21 @@ function RecipesList({ recipes }: { recipes: Recipe[] }) {
 }
 
 export default compose(
-  firestoreConnect(() => [{
-    collection: 'recipes',
-    orderBy: [['title', 'asc']],
-    // TODO: load current group from profile.
-    where: ['group', '==', '1'],
-  }]),
+  connect((state: RootState) => {
+    return ({
+      profile: state.firebase.profile
+    });
+  }),
+  firestoreConnect((props: any) => {
+    if (!isLoaded(props.profile) || isEmpty(props.profile)) {
+      return [];
+    }
+    return [{
+      collection: 'recipes',
+      orderBy: [['title', 'asc']],
+      where: ['group', '==', props.profile.currentGroupId],
+    }]
+  }),
   connect((state: RootState) => {
     return ({
       recipes: state.firestore.ordered.recipes as Recipe[]
