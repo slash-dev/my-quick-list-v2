@@ -12,6 +12,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import configureStore from './Model/store'
 import CoreLayout from './Layouts/CoreLayout'
 import Recipes from './Components/Recipes/Recipes'
+import Groups from './Components/Groups/Groups'
 
 const firebaseConfig = {
   apiKey: "AIzaSyD8h6ZzS0SRK7ZAIj4lMOpfXZ-NMvSEKcg",
@@ -30,7 +31,15 @@ const store = configureStore();
 
 const rrfProps = {
   firebase,
-  config: {},
+  config: {
+    userProfile: 'users',  // where profiles are stored in database
+    useFirestoreForProfile: true,
+    // TODO: Should populate the groups using "groups" table.
+    // Not yet supported for firestore though.
+    // profileParamsToPopulate: [
+    //   'groups:groups'
+    // ]
+  },
   dispatch: store.dispatch,
   createFirestoreInstance
 }
@@ -42,6 +51,7 @@ function App() {
         <Router>
           <CoreLayout >
             <Switch>
+              <Route path="/groups" component={Groups} />
               <Route path="/recipes" component={Recipes} />
             </Switch>
           </CoreLayout>

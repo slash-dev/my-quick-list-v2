@@ -1,4 +1,3 @@
-import React from "react";
 import 'firebase/firestore';
 import { connect } from "react-redux";
 import {
@@ -29,9 +28,10 @@ export default compose(
   firestoreConnect(() => [{
     collection: 'recipes',
     orderBy: [['title', 'asc']],
+    // TODO: load current group from profile.
     where: ['group', '==', '1'],
   }]),
-  connect((state: RootState, props) => {
+  connect((state: RootState) => {
     return ({
       recipes: state.firestore.ordered.recipes as Recipe[]
     });

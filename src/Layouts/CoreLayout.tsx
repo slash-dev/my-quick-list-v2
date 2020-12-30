@@ -21,6 +21,7 @@ import {
   Menu, MenuItem, Slide, useScrollTrigger, Avatar
 } from '@material-ui/core';
 import { RootState } from '../Model/reducer'
+import GroupSelector from '../Components/Groups/Selector'
 
 function UserIsAuthenticated({ children }: any) {
   const firebase = useFirebase()
@@ -110,6 +111,7 @@ function Layout(props: any) {
 
   const drawer = (
     <div>
+      <div style={{ float: 'left', width: '100%', padding: '10px' }}><GroupSelector /></div>
       <div className={classes.toolbar} />
       <Divider />
       <List>
@@ -130,7 +132,7 @@ function Layout(props: any) {
           <ListItemText primary="Sections" />
         </ListItem>
       </List>
-    </div>
+    </div >
   );
 
   const auth = useSelector((state: RootState) => state.firebase.auth)
