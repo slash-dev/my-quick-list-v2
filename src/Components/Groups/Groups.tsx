@@ -2,15 +2,15 @@ import {
   isLoaded, useFirebase
 } from 'react-redux-firebase'
 import { CircularProgress } from '@material-ui/core';
-import { Group, PopulatedProfile } from '../../Model/reducer';
+import { Group } from '../../Model/reducer';
 import { Form, Field } from 'react-final-form'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
-import { PopulateProfile } from "../../Utils/PopulateProfile";
+import { PopulateProfile, PopulateProfileProps } from "../../Utils/PopulateProfile";
 import InputLabel from '@material-ui/core/InputLabel';
 
-function GroupsBase({ auth, profile, firestore }: { auth: any, profile?: PopulatedProfile, firestore: any }) {
+function GroupsBase({ auth, profile, firestore }: PopulateProfileProps) {
   const firebase = useFirebase()
   if (!isLoaded(profile) || !isLoaded(auth)) {
     return <CircularProgress />
@@ -18,11 +18,11 @@ function GroupsBase({ auth, profile, firestore }: { auth: any, profile?: Populat
   const onSubmit = async (values: any, form: any) => {
     const newGroup: Group = {
       name: values.groupName,
-      owner: auth.displayName,
+      owner: auth.displayName!,
       ownerId: auth.uid,
       members: {}
     }
-    newGroup.members[auth.email] = { name: auth.displayName }
+    newGroup.members[auth.email!] = { name: auth.displayName! }
     const groupRef = await firestore.add('groups', newGroup)
     let currentGroups: any[] = [];
     if (profile && profile.groups) {

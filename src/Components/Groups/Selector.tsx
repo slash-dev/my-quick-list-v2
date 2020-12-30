@@ -4,14 +4,14 @@ import {
 } from 'react-redux-firebase'
 import { CircularProgress } from '@material-ui/core';
 import 'firebase/firestore'
-import { PopulateProfile } from '../../Utils/PopulateProfile';
+import { PopulateProfile, PopulateProfileProps } from '../../Utils/PopulateProfile';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import { Group, PopulatedProfile } from '../../Model/reducer';
+import { Group } from '../../Model/reducer';
 import { useHistory } from "react-router-dom";
 
-function GroupSelectorBase({ profile }: { profile?: PopulatedProfile }) {
+function GroupSelectorBase({ profile }: PopulateProfileProps) {
   const firebase = useFirebase()
   const history = useHistory()
   if (!isLoaded(profile)) {

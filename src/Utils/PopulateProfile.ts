@@ -1,7 +1,7 @@
 import { connect } from "react-redux";
-import { firestoreConnect, FirestoreReducer, isEmpty, isLoaded, populate } from "react-redux-firebase";
+import { ExtendedFirestoreInstance, FirebaseReducer, firestoreConnect, FirestoreReducer, isEmpty, isLoaded, populate } from "react-redux-firebase";
 import { compose } from "redux";
-import { RootState } from "../Model/reducer";
+import { PopulatedProfile, RootState } from "../Model/reducer";
 
 export const profilePopulates = [
   { child: 'groups', root: 'groups' },
@@ -26,6 +26,12 @@ function populateProfile(firestore: FirestoreReducer.Reducer) {
     return undefined;
   }
   return profile;
+}
+
+export interface PopulateProfileProps {
+  auth: FirebaseReducer.AuthState,
+  profile?: PopulatedProfile,
+  firestore: ExtendedFirestoreInstance
 }
 
 export const PopulateProfile = compose(

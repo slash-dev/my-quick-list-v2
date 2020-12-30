@@ -1,32 +1,61 @@
 import 'firebase/firestore';
 import { connect } from "react-redux";
 import {
-  isLoaded, isEmpty, firestoreConnect
+  isLoaded, isEmpty, firestoreConnect, ExtendedFirestoreInstance
 } from 'react-redux-firebase'
-import { CircularProgress } from '@material-ui/core';
+import {
+  CircularProgress, Button, TableContainer,
+  Table, TableBody, TableRow, TableCell
+} from '@material-ui/core';
 import { Recipe, RootState } from '../../Model/reducer';
-import 'firebase/firestore'
 import { compose } from "redux";
+import { NavLink } from 'react-router-dom';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import Chip from '@material-ui/core/Chip';
 
-function RecipesList({ recipes }: { recipes: Recipe[] }) {
+function RecipesList({ recipes, firestore }: { recipes: Recipe[], firestore: ExtendedFirestoreInstance }) {
   if (!isLoaded(recipes)) {
     return <CircularProgress />
   }
   if (isEmpty(recipes)) {
     return <p>Recipes list is empty</p>
   }
+  const deleteRecipe = (id: string) => {
+    firestore.delete({ collection: 'recipes', doc: id })
+  }
   return <div>
-    {recipes
-      .map((recipe: Recipe) => (
-        <p key={recipe.id} >{recipe.title}</p>
-      ))}
+    <TableContainer>
+      <Table>
+        <TableBody>
+          {recipes.map((recipe: Recipe) =>
+            <TableRow key={recipe.id}>
+              <TableCell>
+                <Button aria-label={recipe.title} component={NavLink} to={'/recipes/show/' + recipe.id}>
+                  {recipe.title}
+                </Button>
+                <br />
+                {recipe.tags?.map(tag =>
+                  <Chip key={tag} variant="outlined" label={tag} color="primary" size="small" style={{ margin: '2px' }} />
+                )}
+              </TableCell>
+              <TableCell align="right" padding="none">
+                <Button aria-label="Remove" onClick={() => deleteRecipe(recipe.id)}>
+                  Remove
+                          <DeleteForeverIcon />
+                </Button>
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
   </div>
 }
 
 export default compose(
-  connect((state: RootState) => {
+  connect(({ firebase }: RootState) => {
     return ({
-      profile: state.firebase.profile
+      profile: firebase.profile
     });
   }),
   firestoreConnect((props: any) => {
@@ -39,9 +68,9 @@ export default compose(
       where: ['group', '==', props.profile.currentGroupId],
     }]
   }),
-  connect((state: RootState) => {
+  connect(({ firestore }: RootState) => {
     return ({
-      recipes: state.firestore.ordered.recipes as Recipe[]
+      recipes: firestore.ordered.recipes as Recipe[]
     });
   })
 )(RecipesList) as React.ComponentType
